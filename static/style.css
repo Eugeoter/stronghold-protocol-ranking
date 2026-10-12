@@ -16,3 +16,7 @@ dialog{padding:24px;background:linear-gradient(150deg,#16271f,#0c1614);border:1p
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:1450px){.event-logo{display:none}.hero-factions{gap:8px}.hero-factions img{width:24px;height:24px}}
 
+/* Keep grid children from expanding to the full database's intrinsic height. */
+.ranking-panel,.pool-panel{min-height:0;overflow:hidden}
+@media(min-width:1001px){.workspace{grid-template-rows:minmax(0,1fr)}}
+
