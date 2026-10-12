@@ -8,7 +8,7 @@ const getElement = selector => {
   return elements.get(selector);
 };
 const stored = new Map();
-const context = {console,assert,setTimeout,clearTimeout,URL,localStorage:{setItem:(k,v)=>stored.set(k,v),getItem:k=>stored.get(k)},document:{querySelector:getElement,querySelectorAll:()=>[],body:getElement('body')},fetch:()=>{throw new Error('Unexpected network request');}};
+const context = {console,assert,setTimeout,clearTimeout,URL,localStorage:{setItem:(k,v)=>stored.set(k,v),getItem:k=>stored.get(k)},document:{baseURI:'https://eugeoter.github.io/stronghold-protocol-ranking/',querySelector:getElement,querySelectorAll:()=>[],body:getElement('body')},fetch:()=>{throw new Error('Unexpected network request');}};
 vm.createContext(context);
 const source=fs.readFileSync('static/app.js','utf8').replace(/init\(\);\s*$/,'');
 vm.runInContext(source+`
@@ -17,6 +17,7 @@ catalog={seasons:[{id:'s1'},{id:'s2'}],pacts:[],items:[
 {id:'b',name:'乙',kind:'operator',seasons:['s1'],tier:'I',mainPact:'谢拉格',subPacts:['协防干员'],tags:[]},
 {id:'c',name:'丙',kind:'operator',seasons:['s2'],tier:'IV',mainPact:'炎',subPacts:[],tags:[]}
 ]};
+assert.equal(assetURL('/static/assets/example.png'),'https://eugeoter.github.io/stronghold-protocol-ranking/static/assets/example.png','Pages project paths must retain their prefix');
 itemMap=new Map(catalog.items.map(i=>[i.id,i]));pactMap=new Map();
 renderBoard=()=>{};renderPool=()=>{};updateCounts=()=>{};renderAll=()=>{};
 board=defaultBoard('operator','s1');

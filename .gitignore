@@ -7,5 +7,6 @@ __pycache__/
 .env.*
 !.env.example
 /release/
+/dist/
 /data/source-cache/*.json
 !/data/source-cache/manifest.json

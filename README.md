@@ -17,13 +17,22 @@ python app.py
 
 ## 公开部署
 
-项目保留完整 Python 后端，适合 GitHub 保存源码、Render 运行 Flask 服务。GitHub Pages 仅支持静态页面，无法直接运行这些 Python 接口。
+公开网页采用 GitHub Pages：https://eugeoter.github.io/stronghold-protocol-ranking/ 。源码仓库：https://github.com/Eugeoter/stronghold-protocol-ranking 。GitHub Pages 免费，无需银行卡；图片和资料随静态网页发布，排名码在浏览器中处理。完整 Python 后端仍供本地或其他服务器使用。
 
-仓库包含 `render.yaml`，使用免费 Python 服务、新加坡区域、Gunicorn 生产服务器和 `/healthz` 健康检查。将代码上传到自己的 GitHub 仓库后，在 Render 选择 **New → Blueprint** 并连接该仓库，确认服务方案为 **Free** 后部署。成功后以 Render 返回的真实 HTTPS 地址访问网站。
+仓库 Settings → Pages 的 Source 选择 **GitHub Actions**。推送 `main` 会运行 `.github/workflows/pages.yml`，通过检查后生成并发布 `dist/`。本地预览静态版本：
+
+```powershell
+python scripts/build_static.py
+python -m http.server 8000 --directory dist
+```
+
+浏览器版和 Python 版使用同一份资料，分享码可双向导入，兼容 SP1 / SP2。浏览器分享功能需要支持 CompressionStream 的新版 Chrome、Edge、Firefox 或 Safari。草稿仍保存在访问者自己的浏览器，分享链接通过地址中的排名码还原，不需要账户或数据库。
+
+也保留 `render.yaml` 供其他 Python 部署方式使用：新加坡区域、Gunicorn 生产服务器和 `/healthz` 健康检查。在 Render 选择 **New → Blueprint** 并连接仓库可部署；本次 Render 免费服务仍要求添加银行卡，因此公开站点改用 GitHub Pages，未创建 Render 服务。
 
 已有 Render 服务也可手动填写：构建命令 `pip install -r requirements-prod.txt`；启动命令 `gunicorn --config gunicorn.conf.py app:app`；健康检查路径 `/healthz`。Python 版本由 `.python-version` 指定为 3.12。
 
-GitHub 自动检查会运行数据、分享码、前端状态检查，并在 Linux 上启动生产服务器确认健康接口。Render 配置为检查通过后自动部署，后续更新推送到 `main` 即可发布。
+GitHub 自动检查会运行数据、Python 与浏览器分享码兼容性、前端状态检查，并在 Linux 上启动生产服务器确认健康接口。Pages 发布流程只上传静态文件，不发布 Python 源码、研究缓存或本地临时文件到网站目录。
 
 免费服务闲置 15 分钟后可能休眠，下一次访问启动约需一分钟；此限制来自 [Render 免费服务说明](https://render.com/docs/free)。用户榜单存于各自浏览器，服务器休眠不会删除这些榜单。启动与部署不重新下载游戏图片，所需资料和素材随仓库提供。来源缓存与本地临时文件不上传。
 
@@ -41,7 +50,7 @@ GitHub 自动检查会运行数据、分享码、前端状态检查，并在 Lin
 - 分享提供 `SP2.` 排名码与分享链接，包含名称、类型、期数及全部九个位置的顺序。旧 `SP1.` 码和五层本地草稿会迁移到五个主档位，原有排名不丢失。导入不会执行代码，可撤销导入操作。
 - 导出 PNG 保留完整榜单、名称、期数；不受待排名区筛选影响。
 
-**本地自动保存仅属于当前浏览器。** 清除浏览器数据会删除草稿，可用排名码备份。分享码可复制到另一台运行本项目的电脑；本机地址的分享链接仅在能访问该服务的设备上有效，公开分享需先部署 Python 服务。
+**本地自动保存仅属于当前浏览器。** 清除浏览器数据会删除草稿，可用排名码备份。公开站点的分享链接可直接发给他人；本机地址的链接仅在能访问该本地服务的设备上有效。
 
 ## 资料范围
 
@@ -71,10 +80,11 @@ python scripts/sync_catalog.py --refresh
 python -m pip install -r requirements-dev.txt
 python -m unittest discover -s tests -v
 node tests/test_frontend.cjs
+node tests/test_share_codec.cjs
 node --check static/app.js
 ```
 
-Python 检查覆盖排名码往返、中文与顺序保留、无效条目、重复条目、格式错误和解压大小上限。Node 检查在独立的状态模拟环境中验证移动、排序、撤销重做、筛选与草稿恢复，不需要浏览器。Node 只用于开发检查，运行网站只需 Python。
+Python 检查覆盖排名码往返、中文与顺序保留、无效条目、重复条目、格式错误和解压大小上限。Node 检查验证移动、排序、撤销重做、筛选、草稿恢复，以及浏览器 / Python 分享码双向兼容和解压限制。Node 只用于开发检查，本地服务只需 Python，Pages 网站只需浏览器。
 
 ## 后端接口
 
@@ -88,4 +98,4 @@ Python 检查覆盖排名码往返、中文与顺序保留、无效条目、重�
 
 ## 验证范围
 
-已进行后端与前端状态检查及本地素材校验。当前开发环境限制了自动浏览器访问，因此没有完成浏览器中的视觉、真实触控与 PNG 下载验收；可启动项目后使用实际浏览器检查这三项。
+自动检查覆盖后端、前端状态、静态素材完整性和浏览器 / Python 分享码兼容。触控设备操作和不同系统的 PNG 下载仍需在对应实际设备上验证。

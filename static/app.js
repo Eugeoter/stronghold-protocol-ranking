@@ -5,6 +5,15 @@ const KIND_NAMES = {operator:'盟约干员',pact:'盟约',synergy:'进阶盟约'
 const MAIN_LEVELS = [{name:'夯',en:'ABSOLUTE PEAK',color:'#4ddcbb'},{name:'顶级',en:'TOP TIER',color:'#c4dfc8'},{name:'人上人',en:'ABOVE AVERAGE',color:'#e0c591'},{name:'NPC',en:'JUST OKAY',color:'#aebbd0'},{name:'拉完了',en:'BOTTOM TIER',color:'#9a9299'}];
 const LEVELS = MAIN_LEVELS.flatMap((level,index)=>index<4?[level,{name:`介于${level.name}和${MAIN_LEVELS[index+1].name}之间`,short:`${level.name} ↔ ${MAIN_LEVELS[index+1].name}`,en:'BETWEEN TIERS',color:'#1e3730',between:true}]:[level]);
 const STORAGE = 'stronghold-ranking-v1';
+const STATIC_MODE = document.body.dataset?.mode === 'static';
+const assetURL = value => new URL(value.replace(/^\//,''), new URL('.',document.baseURI)).href;
+function prepareAssets(data) {
+  for (const entry of [...data.items,...data.pacts,...(data.enemyGroups||[])]) {
+    if(entry.image)entry.image=assetURL(entry.image);
+    for(const detail of Object.values(entry.seasonDetails||{}))if(detail.image)detail.image=assetURL(detail.image);
+  }
+  return data;
+}
 let catalog, itemMap, pactMap, board, history=[], future=[], drafts={};
 let filters={tier:'',core:'',extra:'',tag:'',search:''};
 let shareMode='export', shareRequest=0, selectedItem=null, drag=null, suppressClick=false, toastTimer;
@@ -56,7 +65,7 @@ function renderAll() {
   $$('#kind-tabs button').forEach(button=>{const active=button.dataset.kind===board.kind;button.classList.toggle('active',active);button.setAttribute('aria-pressed',active);});
   $('#board-title').value=board.title;$('#season-select').value=board.season;
   $('#season-date').textContent=catalog.seasons.find(s=>s.id===board.season)?.date||'';
-  $('#event-logo').src=board.season==='covenant-2025'?'/static/branding/stronghold-alliance.png':'/static/branding/stronghold-alliance-phase2.png';
+  $('#event-logo').src=assetURL(board.season==='covenant-2025'?'/static/branding/stronghold-alliance.png':'/static/branding/stronghold-alliance-phase2.png');
   $('#search-input').placeholder=board.kind==='operator'?'搜索干员名称 / 盟约…':`搜索${KIND_NAMES[board.kind]}名称…`;
   renderFilters();renderBoard();renderPool();updateCounts();
 }
@@ -111,7 +120,14 @@ function renderFilters() {
 function clearFilters() {filters={tier:'',core:'',extra:'',tag:'',search:''};$('#search-input').value='';renderFilters();renderPool();}
 function undo() {if(!history.length)return;const positions=capturePositions();future.push(clone(board));board=history.pop();$('#board-title').value=board.title;remember();renderBoard();renderPool();updateCounts();animatePositions(positions);}
 function redo() {if(!future.length)return;const positions=capturePositions();history.push(clone(board));board=future.pop();$('#board-title').value=board.title;remember();renderBoard();renderPool();updateCounts();animatePositions(positions);}
-async function api(path,body) {const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw new Error(result.error||'操作失败，请重试');return result;}
+async function api(path,body) {
+  if(STATIC_MODE) {
+    if(path==='/api/share')return {board:TierShareCodec.validate(body,catalog),code:await TierShareCodec.encode(body,catalog)};
+    if(path==='/api/import')return {board:await TierShareCodec.decode(body.code,catalog)};
+    throw new Error('不支持的操作');
+  }
+  const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw new Error(result.error||'操作失败，请重试');return result;
+}
 async function openShare(mode='export') {
   const requestId=++shareRequest;
   shareMode=mode;$('#share-error').textContent='';$('#export-tab').classList.toggle('active',mode==='export');$('#import-tab').classList.toggle('active',mode==='import');$('#code-label').textContent=mode==='export'?'你的排名码':'粘贴排名码或分享链接';$('#share-code').readOnly=mode==='export';$('#code-action').textContent=mode==='export'?'复制排名码 ↗':'导入并还原榜单 ↗';$('#copy-link').hidden=mode==='import';$('#share-code').value='';$('#code-action').disabled=true;$('#copy-link').disabled=true;
@@ -239,7 +255,7 @@ function bindEvents() {
 }
 async function init() {
   try {
-    const response=await fetch('/api/catalog');if(!response.ok)throw new Error('资料未能载入');catalog=await response.json();if(!catalog.items?.length||!catalog.seasons?.length)throw new Error('资料库为空，请先同步游戏资料');
+    const response=await fetch(STATIC_MODE?'data/catalog.json':'/api/catalog');if(!response.ok)throw new Error('资料未能载入');catalog=prepareAssets(await response.json());if(!catalog.items?.length||!catalog.seasons?.length)throw new Error('资料库为空，请先同步游戏资料');
     itemMap=new Map(catalog.items.map(item=>[item.id,item]));pactMap=new Map(catalog.pacts.map(pact=>[pact.name,pact]));
     $('#hero-factions').innerHTML=catalog.pacts.filter(p=>p.type==='core').slice(0,5).map(p=>`<img src="${escapeHTML(p.image)}" alt="">`).join('');
     $('#season-select').innerHTML=catalog.seasons.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.name)} · ${escapeHTML(s.date.slice(0,4))}</option>`).join('');
@@ -251,6 +267,6 @@ async function init() {
     if(stored?.compact){document.body.classList.add('compact');$('#view-btn span').textContent='标准视图';}
     renderAll();bindEvents();remember();
     if(location.hash){try{await restore(decodeURIComponent(location.hash.slice(1)));}catch(error){toast(error.message);}}
-  }catch(error){$('#pool').innerHTML=`<div class="empty-state"><b>!</b><span>${escapeHTML(error.message)}</span><span>请确认 Python 服务与 data/catalog.json 可用。</span><button onclick="location.reload()">重新载入</button></div>`;$('#save-status').textContent='资料载入失败';}
+  }catch(error){$('#pool').innerHTML=`<div class="empty-state"><b>!</b><span>${escapeHTML(error.message)}</span><span>${STATIC_MODE?'请检查网络连接，稍后重新载入。':'请确认 Python 服务与 data/catalog.json 可用。'}</span><button onclick="location.reload()">重新载入</button></div>`;$('#save-status').textContent='资料载入失败';}
 }
 init();

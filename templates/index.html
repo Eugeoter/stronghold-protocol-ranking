@@ -7,9 +7,10 @@
   <title>卫戍协议：盟约 · 从夯到拉</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/style.css?v=2">
-  <script src="/static/app.js?v=2" defer></script>
+  <script src="/static/share-codec.js?v=1" defer></script>
+  <script src="/static/app.js?v=3" defer></script>
 </head>
-<body>
+<body data-mode="{{ deployment_mode|default('python') }}">
   <div class="ambient-hud" aria-hidden="true"><img class="ambient-crest" src="/static/branding/rhodes-island-official.svg" alt=""><span class="hud-cross cross-a">+</span><span class="hud-cross cross-b">+</span><span class="hud-cross cross-c">+</span><div class="radar"></div><div class="scan-line"></div></div>
   <header class="topbar">
     <a class="brand" href="/" aria-label="卫戍协议排行榜首页"><img src="/static/branding/rhodes-island-official.svg" alt="罗德岛"><span>RHODES ISLAND<small>战术评估终端 / 非官方同人项目</small></span></a>
