@@ -235,7 +235,8 @@ function bindEvents() {
   $('#season-select').addEventListener('change',event=>switchContext(board.kind,event.target.value));
   $('.filter-panel').addEventListener('click',event=>{const button=event.target.closest('[data-filter]');if(!button)return;filters[button.dataset.filter]=filters[button.dataset.filter]===button.dataset.value?'':button.dataset.value;renderFilters();renderPool();});
   $('#clear-filters').addEventListener('click',clearFilters);$('#search-input').addEventListener('input',event=>{filters.search=event.target.value.trim();renderPool();});
-  $('#board-title').addEventListener('change',event=>{const title=event.target.value.trim()||`我的${KIND_NAMES[board.kind]}排行榜`;if(title!==board.title)commit(()=>board.title=title);event.target.value=title;});
+  $('#board-title').addEventListener('input',event=>{const title=event.target.value.trim()||`我的${KIND_NAMES[board.kind]}排行榜`;if(title!==board.title){checkpoint();board.title=title;remember();$('#undo-btn').disabled=false;$('#redo-btn').disabled=true;}});
+  $('#board-title').addEventListener('change',event=>{event.target.value=board.title;});
   $('#undo-btn').addEventListener('click',undo);$('#redo-btn').addEventListener('click',redo);
   $('#reset-btn').addEventListener('click',()=>{if(!ranked().size){toast('榜单已经为空');return;}commit(()=>board.rows=Array.from({length:9},()=>[]));toast('榜单已重置，可以撤销');});
   $('#view-btn').addEventListener('click',()=>{document.body.classList.toggle('compact');$('#view-btn span').textContent=document.body.classList.contains('compact')?'标准视图':'紧凑视图';remember();});
