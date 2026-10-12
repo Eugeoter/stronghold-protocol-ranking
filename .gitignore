@@ -1,0 +1,11 @@
+__pycache__/
+.venv/
+.pytest_cache/
+*.pyc
+.cache/
+.env
+.env.*
+!.env.example
+/release/
+/data/source-cache/*.json
+!/data/source-cache/manifest.json

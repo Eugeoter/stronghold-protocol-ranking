@@ -1,0 +1,26 @@
+[
+  {
+    "name": "罗德岛官方标志（原始矢量路径）",
+    "file": "/static/branding/rhodes-island-official.svg",
+    "source": "https://ak.hypergryph.com/",
+    "extraction": "Inline path #svg_def-logo_rhodes_island, original path and viewBox preserved; white fill for dark UI."
+  },
+  {
+    "name": "罗德岛官方 PNG",
+    "file": "/static/branding/rhodes-island-official.png",
+    "source": "https://ak.hypergryph.com/",
+    "imageSource": "https://web.hycdn.cn/arknights/official/_next/static/media/rhodes_island.18d9416c.png"
+  },
+  {
+    "name": "卫戍协议：盟约活动标志",
+    "file": "/static/branding/stronghold-alliance.png",
+    "source": "https://prts.wiki/w/卫戍协议：盟约",
+    "imageSource": "https://media.prts.wiki/6/6a/%E5%9B%BE%E6%A0%87_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6.png"
+  },
+  {
+    "name": "卫戍协议：盟约下半活动标志",
+    "file": "/static/branding/stronghold-alliance-phase2.png",
+    "source": "https://prts.wiki/w/卫戍协议：盟约_下半",
+    "imageSource": "https://media.prts.wiki/5/5e/%E5%9B%BE%E6%A0%87_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A.png"
+  }
+]

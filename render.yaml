@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: stronghold-protocol-ranking
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements-prod.txt
+    startCommand: gunicorn --config gunicorn.conf.py app:app
+    healthCheckPath: /healthz
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "1"

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080e10">
+  <meta name="description" content="为明日方舟卫戍协议：盟约制作你的从夯到拉排行榜。拖拽排名、按盟约筛选、导入导出排名码。">
+  <title>卫戍协议：盟约 · 从夯到拉</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css?v=2">
+  <script src="/static/app.js?v=2" defer></script>
+</head>
+<body>
+  <div class="ambient-hud" aria-hidden="true"><img class="ambient-crest" src="/static/branding/rhodes-island-official.svg" alt=""><span class="hud-cross cross-a">+</span><span class="hud-cross cross-b">+</span><span class="hud-cross cross-c">+</span><div class="radar"></div><div class="scan-line"></div></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="卫戍协议排行榜首页"><img src="/static/branding/rhodes-island-official.svg" alt="罗德岛"><span>RHODES ISLAND<small>战术评估终端 / 非官方同人项目</small></span></a>
+    <div class="header-right"><span class="live-dot"></span><span>SIMULATION SERVICE / ONLINE</span><button id="help-btn" class="text-button">使用指南 <span>↗</span></button></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy"><div class="eyebrow"><span class="lime-line"></span> STRONGHOLD PROTOCOL / ALLIANCE</div><h1>卫戍协议<span class="hero-colon">：</span><em>盟约</em><span class="hero-divider">/</span><span class="tier-title">从夯到拉 <b>↘</b></span></h1><p>TACTICAL ASSESSMENT <span>你的战术理解，由你定义。</span></p></div>
+      <div class="hero-insignia" aria-hidden="true"><img id="event-logo" class="event-logo" src="/static/branding/stronghold-alliance-phase2.png" alt=""><div id="hero-factions" class="hero-factions"></div><div class="hero-stamp"><span>ASSESSMENT MATRIX</span><b>05 <i>+ 04</i></b><small>主档位 / 档位之间</small></div></div>
+    </section>
+    <nav id="kind-tabs" class="kind-tabs" aria-label="排名类型">
+      <button data-kind="operator" class="active"><span>01</span>盟约干员 <b>↗</b></button>
+      <button data-kind="pact"><span>02</span>盟约 <b>↗</b></button>
+      <button data-kind="synergy"><span>03</span>进阶盟约 <b>↗</b></button>
+      <button data-kind="strategy"><span>04</span>开局策略 <b>↗</b></button>
+      <button data-kind="enemy"><span>05</span>敌人 <b>↗</b></button>
+      <button data-kind="boss"><span>06</span>BOSS <b>↗</b></button>
+    </nav>
+    <div class="workspace">
+      <section class="ranking-panel">
+        <div class="board-heading"><div class="title-field"><span class="section-code">01 / RANKING</span><input id="board-title" maxlength="80" value="我的盟约干员排行榜" aria-label="榜单名称"><span class="edit-icon">✎</span></div><span id="save-status" class="save-status">本地自动保存</span></div>
+        <div class="board-toolbar"><span><i class="live-dot"></i><b id="ranked-count">0</b> 已排名 <span class="toolbar-divider">/</span> <span id="total-count">—</span> 个条目</span><div><button id="undo-btn" title="撤销 Ctrl+Z" aria-label="撤销">↶</button><button id="redo-btn" title="重做 Ctrl+Shift+Z" aria-label="重做">↷</button><span class="toolbar-divider">|</span><button id="reset-btn" class="reset-btn">↺ 重置榜单</button></div></div>
+        <div id="tier-board" class="tier-board scroll-region" aria-label="五个主档位及四个中间档位排行榜"></div>
+        <div class="board-footer"><span>↕ 拖至分界区域，可置于两个档位之间</span><div><button id="image-btn" class="outline-button">↓ 导出图片</button><button id="share-btn" class="lime-button">分享榜单 <span>↗</span></button></div></div>
+      </section>
+      <section class="pool-panel">
+        <div class="pool-heading"><div><span class="section-code">02 / DATABASE</span><h2>待排名条目 <span id="pool-count">0</span></h2></div><button id="view-btn" class="outline-button" title="切换紧凑视图">▦ <span>紧凑视图</span></button></div>
+        <aside class="filter-panel" aria-label="条目筛选">
+          <div class="filter-heading"><span class="section-code">TACTICAL FILTER</span><button id="clear-filters" class="text-button">清除筛选 ↺</button></div>
+          <div class="pool-context"><div class="select-wrap"><select id="season-select" aria-label="活动期数"></select></div><label class="search-field"><span>⌕</span><input id="search-input" placeholder="搜索干员名称 / 盟约…" aria-label="搜索条目"><kbd>/</kbd></label></div><small id="season-date" class="season-date"></small>
+          <div id="operator-filters"><div class="class-filter-line"><div class="filter-label">等阶 <span>CLASS</span></div><div id="tier-filters" class="tier-filters"></div></div><div class="alliance-filters"><details class="filter-group" open><summary>核心盟约 <span>CORE / 阵营</span></summary><div id="core-filters" class="pact-filters"></div></details><details class="filter-group" open><summary>附加盟约 <span>EXTRA / 能力</span></summary><div id="extra-filters" class="pact-filters"></div></details></div></div>
+          <div id="other-filters" hidden><div id="tag-filter-label" class="filter-label">条目类型 <span>TYPE</span></div><div id="tag-filters" class="tag-filters"></div></div>
+          <div class="filter-note"><span>ⓘ</span><p id="filter-note">等阶为活动内配置；核心盟约反映阵营，附加盟约反映能力。</p></div>
+        </aside>
+        <div id="pool" class="pool drop-zone scroll-region" data-row="pool"><div class="loading">正在载入战术数据库…</div></div>
+        <div class="pool-bottom"><span id="pool-caption">拖动头像到上方的任意层级，开始你的排名。</span><span>DRAG. RANK. SHARE.</span></div>
+      </section>
+    </div>
+    <footer class="site-footer"><span>ARKNIGHTS <b>卫戍协议：盟约</b> / FAN-MADE TACTICAL TERMINAL</span><div><button id="sources-btn" class="text-button">数据与素材来源 ↗</button><span>游戏素材 © 鹰角网络</span><span class="footer-cross">+</span></div></footer>
+  </main>
+  <dialog id="share-dialog"><div class="dialog-top"><span class="section-code">SHARE / RESTORE</span><button class="close-dialog" aria-label="关闭">×</button></div><h2>让你的排名有回响。</h2><p>排名码完整保存名称、期数、类型、五个主档位与四个中间档位。</p><div class="dialog-tabs"><button id="export-tab" class="active">导出榜单</button><button id="import-tab">导入榜单</button></div><label for="share-code" id="code-label">你的排名码</label><textarea id="share-code" rows="5" spellcheck="false" placeholder="粘贴 SP2. 排名码或分享链接，也兼容旧版 SP1. 排名码"></textarea><div id="share-error" class="error-message" role="alert"></div><div class="dialog-actions"><button id="copy-link" class="outline-button">复制分享链接</button><button id="code-action" class="lime-button">复制排名码 ↗</button></div></dialog>
+  <dialog id="item-dialog"><div class="dialog-top"><span class="section-code">ENTRY / ASSESSMENT</span><button class="close-dialog" aria-label="关闭">×</button></div><div id="item-detail"></div><div class="detail-label">将条目放入</div><div id="move-buttons" class="move-buttons"></div><button id="return-pool" class="outline-button full-width">移回待排名区</button></dialog>
+  <dialog id="info-dialog"><div class="dialog-top"><span class="section-code">FIELD MANUAL</span><button class="close-dialog" aria-label="关闭">×</button></div><div id="info-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="drag-live" class="sr-only" aria-live="polite"></div>
+</body>
+</html>
